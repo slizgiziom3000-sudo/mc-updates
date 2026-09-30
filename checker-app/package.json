@@ -1,0 +1,4 @@
+{"name":"mc-checker","productName":"MC Checker","version":"1.0.0","description":"MC Checker","author":"you","main":"main.js",
+"scripts":{"start":"electron .","dist":"electron-builder"},
+"devDependencies":{"electron":"^33.0.0","electron-builder":"^25.0.0"},
+"build":{"appId":"com.you.mc-checker","files":["main.js","config.json","page.html"],"win":{"target":"nsis"},"mac":{"target":"dmg"},"linux":{"target":"AppImage"}}}
