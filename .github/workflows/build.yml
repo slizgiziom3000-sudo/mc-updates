@@ -1,0 +1,26 @@
+name: Build apps
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build installers
+        shell: pwsh
+        run: |
+          foreach ($d in 'checker-app','admin-app') {
+            if (Test-Path "$d/package.json") {
+              Push-Location $d
+              npm install
+              npx electron-builder --win --publish never
+              Pop-Location
+            }
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers
+          path: "*/dist/*.exe"
