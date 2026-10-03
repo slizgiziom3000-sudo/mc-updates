@@ -22,9 +22,9 @@ let win;
 ipcMain.handle('mc:fetchText',async(e,url)=>{
   try{
     const u=new URL(url);
-    if(u.protocol!=='https:'||u.hostname!=='guns.lol'||!/^\/[A-Za-z0-9_]{1,32}$/.test(u.pathname))return{error:'blocked url'};
+    if(u.protocol!=='https:'||u.hostname!=='auth.roblox.com'||u.pathname!=='/v1/usernames/validate')return{error:'blocked url'};
     const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),9000);
-    const r=await net.fetch(u.href,{signal:ctl.signal,redirect:'follow',headers:{'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36','Accept':'text/html'}}).finally(()=>clearTimeout(t));
+    const r=await net.fetch(u.href,{signal:ctl.signal,redirect:'follow',headers:{'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36','Accept':'application/json'}}).finally(()=>clearTimeout(t));
     const body=(await r.text()).slice(0,200000);
     return{status:r.status,body};
   }catch(err){return{error:String(err&&err.message||err).slice(0,120)}}
