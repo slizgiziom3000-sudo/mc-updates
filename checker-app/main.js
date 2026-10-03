@@ -32,7 +32,8 @@ ipcMain.handle('mc:fetchText',async(e,url)=>{
 app.whenReady().then(()=>{
   protocol.handle('app',()=>new Response(html(),{headers:{'content-type':'text/html; charset=utf-8'}}));
   Menu.setApplicationMenu(null);
-  win=new BrowserWindow({width:1100,height:800,title:'MC Checker',icon:path.join(__dirname,'build','icon.png'),autoHideMenuBar:true,webPreferences:{contextIsolation:true,nodeIntegration:false,sandbox:true,preload:path.join(__dirname,'preload.js')}});
+  win=new BrowserWindow({width:1100,height:800,title:'MC Checker v'+app.getVersion(),icon:path.join(__dirname,'build','icon.png'),autoHideMenuBar:true,webPreferences:{contextIsolation:true,nodeIntegration:false,sandbox:true,preload:path.join(__dirname,'preload.js')}});
+  win.on('page-title-updated',e=>e.preventDefault());
   win.webContents.setWindowOpenHandler(({url})=>{if(/^https:/.test(url))shell.openExternal(url);return{action:'deny'}});
   win.webContents.on('will-navigate',(e,u)=>{if(!u.startsWith('app://')){e.preventDefault();if(/^https:/.test(u))shell.openExternal(u)}});
   win.loadURL('app://checker/');
