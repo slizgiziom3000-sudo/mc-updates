@@ -1,4 +1,4 @@
-const {app,BrowserWindow,protocol,shell,Menu,dialog}=require('electron');
+const {app,BrowserWindow,protocol,shell,Menu,dialog,ipcMain,net}=require('electron');
 const fs=require('fs'),path=require('path'),https=require('https'),http=require('http');
 const cfg=require('./config.json');
 protocol.registerSchemesAsPrivileged([{scheme:'app',privileges:{standard:true,secure:true,supportFetchAPI:true}}]);
@@ -19,10 +19,20 @@ async function checkUpdate(){
       if(h.length>5000&&h.includes(cfg.pub)){fs.writeFileSync(U('page.html'),h);fs.writeFileSync(U('version.txt'),String(v));return true}}}catch(e){}
   return false}
 let win;
+ipcMain.handle('mc:fetchText',async(e,url)=>{
+  try{
+    const u=new URL(url);
+    if(u.protocol!=='https:'||u.hostname!=='guns.lol'||!/^\/[A-Za-z0-9_]{1,32}$/.test(u.pathname))return{error:'blocked url'};
+    const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),9000);
+    const r=await net.fetch(u.href,{signal:ctl.signal,redirect:'follow',headers:{'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36','Accept':'text/html'}}).finally(()=>clearTimeout(t));
+    const body=(await r.text()).slice(0,200000);
+    return{status:r.status,body};
+  }catch(err){return{error:String(err&&err.message||err).slice(0,120)}}
+});
 app.whenReady().then(()=>{
   protocol.handle('app',()=>new Response(html(),{headers:{'content-type':'text/html; charset=utf-8'}}));
   Menu.setApplicationMenu(null);
-  win=new BrowserWindow({width:1100,height:800,title:'MC Checker',autoHideMenuBar:true,webPreferences:{contextIsolation:true,nodeIntegration:false,sandbox:true}});
+  win=new BrowserWindow({width:1100,height:800,title:'MC Checker',icon:path.join(__dirname,'build','icon.png'),autoHideMenuBar:true,webPreferences:{contextIsolation:true,nodeIntegration:false,sandbox:true,preload:path.join(__dirname,'preload.js')}});
   win.webContents.setWindowOpenHandler(({url})=>{if(/^https:/.test(url))shell.openExternal(url);return{action:'deny'}});
   win.webContents.on('will-navigate',(e,u)=>{if(!u.startsWith('app://')){e.preventDefault();if(/^https:/.test(u))shell.openExternal(u)}});
   win.loadURL('app://checker/');
