@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NC Checker</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NC Checker">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#000000">
+<style>html,body{margin:0;height:100%;background:#000}iframe{position:fixed;inset:0;width:100%;height:100%;border:0;background:#000}</style></head>
+<body><iframe id="f" title="NC Checker"></iframe>
+<script>
+// The page itself lives in ../publish/page.html - the same file as the PC app and Android app.
+// Updating that file updates this app too (reload the app to get it).
+document.getElementById("f").src="../publish/page.html?t="+Math.floor(Date.now()/60000);
+</script></body></html>
