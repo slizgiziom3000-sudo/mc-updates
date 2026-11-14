@@ -29,6 +29,16 @@ ipcMain.handle('mc:fetchText',async(e,url)=>{
     return{status:r.status,body};
   }catch(err){return{error:String(err&&err.message||err).slice(0,120)}}
 });
+ipcMain.handle('mc:postJson',async(e,url,body)=>{
+  try{
+    const u=new URL(url);
+    if(u.protocol!=='https:'||u.hostname!=='discord.com'||u.pathname!=='/api/v9/unique-username/username-attempt-unauthed')return{error:'blocked url'};
+    const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),9000);
+    const r=await net.fetch(u.href,{method:'POST',signal:ctl.signal,redirect:'follow',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({username:String(body&&body.username||'').slice(0,40)})});
+    clearTimeout(t);
+    return{status:r.status,body:(await r.text()).slice(0,20000)};
+  }catch(err){return{error:String(err&&err.message||err).slice(0,120)}}
+});
 app.commandLine.appendSwitch('disable-frame-rate-limit');
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
 app.whenReady().then(()=>{
